@@ -1,9 +1,14 @@
+"use client";
+import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import StatCard from "@/components/StatCard";
 import RatingChart from "@/components/RatingChart";
+import UserStats from "@/components/UserStats";
 
 export default function Home() {
+  const [username, setUsername] = useState("tourist");
+  const [userData, setUserData] = useState<any>(null);
   return (
     <div className="flex">
       <Sidebar />
@@ -17,16 +22,21 @@ export default function Home() {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="Codeforces Rating" value="1450" />
+          <StatCard title="Codeforces Rating" value={userData?.rating || "Loading"} />
 
-          <StatCard title="Problems Solved" value="320" />
+          <StatCard title="Problems Solved" value="80" />
 
-          <StatCard title="Daily Streak" value="12 Days" />
+          <StatCard title="Daily Streak" value="35 Days" />
 
-          <StatCard title="Global Rank" value="#4521" />
+          <StatCard title="Global Rank" value={userData?.rank || "Loading"} />
         </div>
 
-        <RatingChart />
+        <RatingChart username={username} />
+        <UserStats
+  username={username}
+  setUsername={setUsername}
+  setUserData={setUserData}
+/>
 
       </div>
     </div>
