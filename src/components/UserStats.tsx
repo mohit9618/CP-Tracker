@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCodeforcesUser } from "@/services/codeforces";
+import { getCodeforcesData } from "../services/codeforces";
 
 export default function UserStats({
   username,
@@ -15,32 +15,49 @@ export default function UserStats({
 
   const [error, setError] = useState("");
 
-  async function fetchUser(handle: string) {
-    try {
-      setError("");
+  const [loading, setLoading] = useState(true);
 
-      const data = await getCodeforcesUser(handle);
+  async function fetchUser() {
+
+    try {
+
+      setLoading(true);
+
+      setError("");
+      console.log(username);
+      const data = await getCodeforcesData(username);
+
+console.log("FULL DATA:", data);
+console.log("USER INFO:", data?.userInfo);
 
       if (!data) {
         throw new Error("User not found");
       }
+console.log("SETTING USER:", data.userInfo);
+      setUser(data.userInfo);
 
-      setUser(data);
       setUserData(data);
 
-    } catch {
-
-      setUser(null);
+    } catch (error) {
 
       setError("User not found");
+
+      console.log(error);
+
+    } finally {
+
+      setLoading(false);
+
     }
   }
 
   useEffect(() => {
-    fetchUser(username);
+
+    fetchUser();
+
   }, [username]);
 
-  if (!user && !error) {
+  if (loading) {
     return <p className="text-white">Loading...</p>;
   }
 

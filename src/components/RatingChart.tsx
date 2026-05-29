@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import {
   LineChart,
   Line,
@@ -11,44 +10,71 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { getUserRating } from "@/services/codeforces";
+import { getCodeforcesData } from "../services/codeforces";
 
 export default function RatingChart({
   username,
-}: any) {
+}: {
+  username: string;
+}) {
 
-  const [data, setData] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
   const [currentRating, setCurrentRating] = useState(0);
-
-const [maxRating, setMaxRating] = useState(0);
+  const [maxRating, setMaxRating] = useState(0);
 
   useEffect(() => {
 
     async function fetchRating() {
 
-      const result = await getUserRating(username);
+      try {
 
-      const formattedData = result.map((contest: any) => ({
-        contest: contest.contestName,
-        rating: contest.newRating,
-      }));
+        const response = await getCodeforcesData(username);
 
-      setData(formattedData);
-      if (result.length > 0) {
+        console.log("Rating API Response:", response);
 
-  setCurrentRating(
-    result[result.length - 1].newRating
-  );
+        if (
+          !response ||
+          !response.ratingHistory ||
+          !Array.isArray(response.ratingHistory)
+        ) {
+          setChartData([]);
+          return;
+        }
 
-  const max = Math.max(
-    ...result.map((c: any) => c.newRating)
-  );
+        const formattedData = response.ratingHistory.map(
+          (contest: any) => ({
+            contest: contest.contestName,
+            rating: contest.newRating,
+          })
+        );
 
-  setMaxRating(max);
-}
+        setChartData(formattedData);
+
+        if (response.userInfo) {
+
+          setCurrentRating(
+            response.userInfo.rating || 0
+          );
+
+          setMaxRating(
+            response.userInfo.maxRating || 0
+          );
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Error fetching rating data:",
+          error
+        );
+
+        setChartData([]);
+      }
     }
 
-    fetchRating();
+    if (username) {
+      fetchRating();
+    }
 
   }, [username]);
 
@@ -59,34 +85,38 @@ const [maxRating, setMaxRating] = useState(0);
         Rating Progress
       </h2>
 
-    <div className="flex gap-10 mb-6 text-white">
+      <div className="flex gap-10 mb-6 text-white">
 
-  <div>
-    <p className="text-gray-400">
-      Current Rating
-    </p>
+        <div>
+          <p className="text-gray-400">
+            Current Rating
+          </p>
 
-    <h3 className="text-3xl font-bold">
-      {currentRating}
-    </h3>
-  </div>
+          <h3 className="text-3xl font-bold">
+            {currentRating}
+          </h3>
+        </div>
 
-  <div>
-    <p className="text-gray-400">
-      Max Rating
-    </p>
+        <div>
+          <p className="text-gray-400">
+            Max Rating
+          </p>
 
-    <h3 className="text-3xl font-bold text-yellow-400">
-      {maxRating}
-    </h3>
-  </div>
+          <h3 className="text-3xl font-bold text-yellow-400">
+            {maxRating}
+          </h3>
+        </div>
 
-</div>
-      <div className="w-full h-96">
+      </div>
 
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="w-full h-[400px]">
 
-          <LineChart data={data}>
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+        >
+
+          <LineChart data={chartData}>
 
             <XAxis
               dataKey="contest"
@@ -102,6 +132,7 @@ const [maxRating, setMaxRating] = useState(0);
               dataKey="rating"
               stroke="#3b82f6"
               strokeWidth={3}
+              dot={false}
             />
 
           </LineChart>
