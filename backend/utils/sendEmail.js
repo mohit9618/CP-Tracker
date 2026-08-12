@@ -1,25 +1,41 @@
 async function sendEmail(to, subject, html) {
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-    },
-    body: JSON.stringify({
-      from: "CP Tracker <onboarding@resend.dev>",
-      to: [to],
-      subject,
-      html,
-    }),
-  });
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        sender: {
+          name: "CP Tracker",
+          email: process.env.BREVO_SENDER_EMAIL,
+        },
+        to: [
+          {
+            email: to,
+          },
+        ],
+        subject: subject,
+        htmlContent: html,
+      }),
+    });
 
-  if (!response.ok) {
-    const error = await response.text();
-    console.error("Resend error:", error);
-    throw new Error("Failed to send email");
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Brevo error:", data);
+      throw new Error(data.message || "Failed to send email");
+    }
+
+    console.log("Email sent successfully:", data.messageId);
+
+    return data;
+  } catch (error) {
+    console.error("Email sending failed:", error);
+    throw error;
   }
-
-  return response.json();
 }
 
 module.exports = sendEmail;
