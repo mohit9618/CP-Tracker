@@ -1,7 +1,7 @@
 export async function getCodeforcesData(username: string) {
 
 const response = await fetch(
-  `http://127.0.0.1:5000/api/codeforces/${username}`
+  `${process.env.NEXT_PUBLIC_API_URL}/codeforces/${username}`
 );
 
   const data = await response.json();
