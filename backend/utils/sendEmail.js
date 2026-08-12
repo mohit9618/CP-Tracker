@@ -1,23 +1,25 @@
-const nodemailer = require("nodemailer");
-
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
 async function sendEmail(to, subject, html) {
-  await transporter.sendMail({
-    from: `CP Tracker <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    html,
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+    },
+    body: JSON.stringify({
+      from: "CP Tracker <onboarding@resend.dev>",
+      to: [to],
+      subject,
+      html,
+    }),
   });
+
+  if (!response.ok) {
+    const error = await response.text();
+    console.error("Resend error:", error);
+    throw new Error("Failed to send email");
+  }
+
+  return response.json();
 }
 
 module.exports = sendEmail;
