@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "../services/auth";
+import { getCurrentUser, logout } from "../services/auth";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 import { FaChartLine, FaTrophy } from "react-icons/fa";
 import { MdLeaderboard } from "react-icons/md";
 import { GiCrossedSwords } from "react-icons/gi";
+
 
 import PageWrapper from "../components/ui/PageWrapper";
 
@@ -46,11 +47,7 @@ export default function Home() {
     checkUser();
   }, []);
   async function handleLogout() {
-  await fetch("http://localhost:5000/api/auth/logout", {
-    method: "POST",
-    credentials: "include",
-  });
-
+  await logout();
   setUser(null);
 }
 

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaUser, FaLock } from "react-icons/fa";
+import { login } from "../../services/auth";
 
 export default function LoginPage() {
   const [codeforcesHandle, setCodeforcesHandle] = useState("");
@@ -15,41 +16,26 @@ export default function LoginPage() {
   const router = useRouter();
 
   async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
+  e.preventDefault();
 
-    setError("");
-    setLoading(true);
+  setError("");
+  setLoading(true);
 
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            codeforcesHandle,
-            password,
-          }),
-        }
-      );
+  try {
+    const data = await login(codeforcesHandle, password);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || "Login failed");
-        return;
-      }
-
-      router.push("/");
-    } catch {
-      setError("Something went wrong");
-    } finally {
-      setLoading(false);
+    if (data.error) {
+      setError(data.error);
+      return;
     }
+
+    router.push("/");
+  } catch {
+    setError("Something went wrong");
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
   <main className="relative min-h-screen bg-[#050914] text-white flex items-center justify-center overflow-hidden">

@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/reminders";
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/reminders`;
 
 export async function getReminders() {
   const response = await fetch(API_URL, {
@@ -20,13 +20,10 @@ export async function addReminder(contest: {
 }) {
   const response = await fetch(API_URL, {
     method: "POST",
-
     headers: {
       "Content-Type": "application/json",
     },
-
     credentials: "include",
-
     body: JSON.stringify(contest),
   });
 
@@ -40,13 +37,10 @@ export async function addReminder(contest: {
 }
 
 export async function deleteReminder(id: string) {
-  const response = await fetch(
-    `${API_URL}/${id}`,
-    {
-      method: "DELETE",
-      credentials: "include",
-    }
-  );
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw new Error("Failed to delete reminder");

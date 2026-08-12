@@ -18,7 +18,7 @@ const app = express();
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
@@ -39,10 +39,8 @@ app.get("/api/test", (req, res) => {
   res.send("TEST WORKING");
 });
 
-const PORT = 5000;
-app.get("/api/test", (req, res) => {
-  res.send("HELLO MOHIT");
-});
+const PORT = process.env.PORT || 5000;
+
 async function startServer() {
   try {
     await connectDB();

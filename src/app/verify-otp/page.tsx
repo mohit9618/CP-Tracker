@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { verifyOTP } from "../../services/auth";
 
-export default function VerifyOTPPage() {
+function VerifyOTPForm()  {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -251,4 +251,12 @@ export default function VerifyOTPPage() {
 
   </main>
 );
+}
+
+export default function VerifyOTPPage() {
+  return (
+    <Suspense fallback={null}>
+      <VerifyOTPForm />
+    </Suspense>
+  );
 }
