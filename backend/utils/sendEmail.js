@@ -1,7 +1,9 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
 
   auth: {
     user: process.env.EMAIL_USER,
@@ -11,7 +13,7 @@ const transporter = nodemailer.createTransport({
 
 async function sendEmail(to, subject, html) {
   await transporter.sendMail({
-    from: `"CP Tracker" <${process.env.EMAIL_USER}>`,
+    from: `CP Tracker <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html,
